@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Visa Validation Application</title>
+    
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+   
+   
+   <style>
+     
+     
+     
+     :root {
+            --emirates-red: #D72323; 
+            --emirates-dark-red: #B01C1C; 
+            --emirates-gold: #FFD700;
+            --light-grey: #f5f5f5;
+            --dark-text: #333333;
+            --optional-btn-bg: #e0e0e0; 
+            --optional-btn-hover: #c7c7c7; 
+            --failed-issues-bg: #fff3e0;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column; 
+            background-image: url('ek.avif'); 
+            background-size: cover; 
+            background-position: center; 
+            background-repeat: no-repeat;
+            background-attachment: fixed; 
+            font-family: "Inter", sans-serif;
+            color: var(--dark-text);
+        }
+        main {
+            flex: 1 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0;
+        }
+        .container {
+            max-width: 600px;
+            padding: 20px;
+            background-color: #ffffff; 
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .card-panel {
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+        .success-text {
+            color: #4CAF50; 
+            font-weight: bold;
+        }
+        .failure-text {
+            color: #f44336;
+            font-weight: bold;
+        }
+        .validation-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .validation-item i {
+            margin-right: 10px;
+            color: #757575; 
+        }
+        .validation-item.completed i {
+            color: #4CAF50; 
+        }
+        .validation-item.failed i {
+            color: #f44336;
+        }
+      
+        .btn {
+            background-color: var(--emirates-red); 
+            border-radius: 8px; 
+            width: 180px; 
+            height: 38px;
+            line-height: 38px; 
+            padding: 0 15px; 
+            font-size: 0.85rem; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            white-space: nowrap; 
+            box-shadow: none; 
+        }
+        .btn:hover {
+            background-color: var(--emirates-dark-red); 
+            box-shadow: none;
+        }
+      
+        nav, .page-footer {
+            background-color: var(--emirates-red) !important; 
+        }
+       
+        nav .container, .page-footer .container {
+            background-color: transparent !important;
+            box-shadow: none !important;
+            padding: 0 15px !important; 
+            display: flex; 
+            justify-content: center;
+            align-items: center; 
+        }
+       
+        .brand-logo, .footer-copyright .container {
+            color: #ffffff !important; 
+        }
+
+
+
+
+
+
+
+        .brand-logo {
+            white-space: nowrap;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 120%;
+            padding: -10px -40px;
+        }
+        .brand-logo img {
+            height: 90px;
+            margin-top: 5px;
+            margin-right: 0px;
+            margin-left: 0px;
+            margin-bottom: 10px;
+        }
+        .brand-logo .app-title {
+            font-size: 2rem;
+            font-weight: bold;
+            line-height: 1;
+            margin-bottom: 10px;
+            margin-left: -12px;
+        }
+        .brand-logo .tagline {
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            line-height: 1;
+        }
+        .brand-logo .tagline .material-icons {
+            font-size: 1rem;
+            margin-right: 5px;
+            color: var(--emirates-gold);
+        }
+
+
+
+
+        nav {
+            height: 150px;
+            line-height: 20px;
+        }
+        nav .nav-wrapper {
+            height: 100%;
+        }
+        nav .brand-logo {
+            height: 100%;
+            padding: 0 -10px;
+        }
+       
+        #booking-section, #otp-section, #upload-section, #results-display-section, #final-results-section, #manual-verification-section {
+            display: none;
+        }
+       
+        #loader-container {
+            display: none;
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+            justify-content: center;
+        }
+        #loading-message {
+            margin-top: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--dark-text);
+        }
+        #loader-icon {
+            font-size: 3rem; 
+            color: var(--emirates-red);
+            margin-bottom: 10px; 
+        }
+       
+        #qrcode-container {
+            margin-top: 30px;
+            text-align: center; 
+            display: flex;
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        #qrcode-container canvas {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 5px;
+            background-color: #fff;
+            display: block;
+            margin: 0 auto;
+        }
+        .ok-to-board-message {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4CAF50;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center; 
+        }
+
+
+
+        .ok-to-board-message .material-icons {
+            font-size: 2rem;
+            margin-right: 8px; 
+            color: #4CAF50;
+        }
+       
+        .final-buttons-container {
+            display: flex;
+            justify-content: center; 
+            gap: 20px; 
+            margin-top: 20px;
+            flex-wrap: wrap; 
+        }
+       
+        #samsung-wallet-btn {
+            background-color: var(--emirates-red); 
+            color: #ffffff;
+            width: 220px;
+            height: 50px;
+            line-height: 50px;
+            font-size: 1rem;
+        }
+        #samsung-wallet-btn:hover {
+            background-color: var(--emirates-dark-red);
+        }
+       
+        #newValidationBtn {
+            background-color: var(--emirates-red); 
+            width: 220px;
+            height: 50px;
+            line-height: 50px;
+            font-size: 1rem;
+        }
+        #newValidationBtn:hover {
+            background-color: var(--emirates-dark-red);
+        }
+
+        .file-upload-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .file-upload-container .file-field .btn.file-upload-btn {
+            width: 180px;
+            height: 38px;
+            line-height: 38px;
+            padding: 0 15px;
+            font-size: 0.85rem;
+        }
+
+        .file-upload-container .file-field input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-upload-container .file-field .btn span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .file-upload-container .file-field .file-path-wrapper {
+            flex-grow: 1;
+            margin-left: 10px;
+            height: 38px;
+            line-height: 38px;
+        }
+
+        .file-upload-container .file-field .file-path-wrapper input.file-path {
+            height: 38px;
+            line-height: 38px;
+            margin: 0;
+            border-bottom: 1px solid #9e9e9e;
+            box-shadow: none;
+        }
+
+        .file-upload-container .file-upload-status {
+            color: #4CAF50; 
+            font-size: 1.8rem; 
+            display: none; 
+            margin-left: 10px; 
+        }
+
+        .file-upload-container.mandatory .file-field .btn {
+            background-color: var(--emirates-red); 
+            border: 2px solid var(--emirates-dark-red);
+        }
+
+        .file-upload-container.optional .file-field .btn {
+            background-color: var(--optional-btn-bg);
+            color: var(--dark-text);
+            border: 1px solid #cccccc;
+        }
+        .file-upload-container.optional .file-field .btn:hover {
+            background-color: var(--optional-btn-hover);
+        }
+
+        .upload-buttons-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px; 
+        }
+
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+            .input-field label {
+                font-size: 0.9rem;
+            }
+            .input-field input {
+                font-size: 1rem;
+            }
+            .ok-to-board-message {
+                font-size: 1.2rem;
+            }
+            .brand-logo img {
+                height: 30px;
+            }
+            .brand-logo .app-title {
+                font-size: 2rem;
+            }
+            .brand-logo .tagline {
+                font-size: 0.7rem;
+            }
+            .brand-logo .tagline .material-icons {
+                font-size: 0.9rem;
+            }
+            nav {
+                height: 70px;
+                line-height: 70px;
+            }
+            nav .brand-logo {
+                padding: 5px 0;
+            }
+
+            #samsung-wallet-btn {
+                font-size: 0.9rem;
+                padding: 0 10px;
+                width: 100%;
+                height: 45px;
+                line-height: 45px;
+            }
+            #newValidationBtn {
+                font-size: 0.9rem;
+                padding: 0 10px;
+                width: 100%;
+                height: 45px;
+                line-height: 45px;
+            }
+            .btn {
+                width: 100%;
+                font-size: 0.85rem;
+                height: 32px;
+                line-height: 32px;
+            }
+            .file-upload-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .file-upload-container .file-field {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .file-upload-container .file-field .btn.file-upload-btn {
+                width: 100%;
+                height: 32px;
+                line-height: 32px;
+                margin-right: 0;
+            }
+            .file-upload-container .file-field .file-path-wrapper {
+                margin-left: 0;
+                width: 100%;
+            }
+            .file-upload-container .file-upload-status {
+                margin-top: 5px;
+                margin-left: 0;
+            }
+            .upload-buttons-row {
+                flex-direction: column; 
+            }
+            .upload-buttons-row .col.s6 {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .final-buttons-container {
+                flex-direction: column; 
+                gap: 10px; 
+            }
+        }
+
+        #manual-verification-section p {
+            color: var(--dark-text);
+        }
+        #manual-verification-section p.failure-text {
+            color: var(--emirates-red);
+        }
+        #manual-verification-section #failed-checks-list {
+            background-color: var(--failed-issues-bg);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        #manual-verification-section #failed-checks-list .validation-item {
+            color: var(--dark-text);
+        }
+        #manual-verification-section #failed-checks-list .validation-item i {
+            color: var(--emirates-red) !important;
+        }
+        #manual-verification-section #failed-checks-list .validation-item .reason-text {
+            font-size: 0.9rem;
+            color: #616161;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav role="navigation">
+            <div class="nav-wrapper container">
+                <a id="logo-container" href="#" class="brand-logo">
+                    <img src="https://c.ekstatic.net/ecl/logos/emirates/emirates-logo-badge.svg?h=d-52wmsnqryhi7L83BAKpg" alt="Emirates Logo">
+                    <br/><span class="app-title">Jahis Pass</span>
+                    <!-- <span class="tagline"><i class="material-icons">flight_takeoff</i>Boarding experience redefined - powered by Emirates</span> -->
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <div id="booking-section" style="display: block;"> 
+                <!-- harry - just adding basic block -->
+                <h4 class="center-align">Help us with your Booking Details</h4>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <i class="material-icons prefix">flight_takeoff</i>
+                        <input id="booking_reference" type="text" class="validate" required oninput="this.value = this.value.toUpperCase()">
+                        <label for="booking_reference">Booking Reference</label>
+                    </div>
+                    <div class="col s12 center-align">
+                        <button class="btn waves-effect waves-light" type="submit" name="action" id="proceedToUploadBtn">
+                            Proceed
+                            <i class="material-icons right">arrow_forward</i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="otp-section">
+                <h4 class="center-align">Verify Your Identity</h4>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <i class="material-icons prefix">email</i>
+                        <input id="registered_email" type="email" class="validate" required value="test@example.com">
+                        <label for="registered_email">Registered Email Address</label>
+                    </div>
+                    <div class="col s12 center-align">
+                        <button class="btn waves-effect waves-light" id="sendOtpBtn">
+                            Send OTP
+                            <i class="material-icons right">send</i>
+                        </button>
+                    </div>
+                    <div class="input-field col s12" style="margin-top: 20px;">
+                        <i class="material-icons prefix">lock_open</i>
+                        <input id="otp_input" type="text" class="validate" required>
+                        <label for="otp_input">Enter OTP</label>
+                    </div>
+                    <div class="col s12 center-align">
+                        <button class="btn waves-effect waves-light" id="verifyOtpBtn">
+                            Verify OTP
+                            <i class="material-icons right">check</i>
+                        </button>
+                    </div>
+                    <div class="col s12 center-align" style="margin-top: 20px;">
+                        <button class="btn waves-effect waves-light grey" id="backToBookingFromOtpBtn">
+                            Back
+                            <i class="material-icons left">arrow_back</i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+            <div id="upload-section">
+                <h4 class="center-align" id="upload-section-heading">Upload Your Documents</h4>
+                <div class="row">
+                    <div class="col s12 file-upload-container" id="passport_upload_group">
+                        <div class="file-field input-field">
+                            <div class="btn file-upload-btn">
+                                <span>Passport File (Optional)</span>
+                                <input type="file" id="passport_file" accept="image/jpeg,image/jpg,image/png,application/pdf">
+                            </div>
+                            <div class="file-path-wrapper">
+                                <input class="file-path validate" type="text" placeholder="Upload your passport document">
+                            </div>
+                        </div>
+                        <i class="material-icons file-upload-status" id="passport_file_status">check_circle</i>
+                    </div>
+                    <div class="col s12 file-upload-container" id="visa_upload_group">
+                        <div class="file-field input-field">
+                            <div class="btn file-upload-btn">
+                                <span>Visa File (Optional)</span>
+                                <input type="file" id="visa_file" accept="image/jpeg,image/jpg,image/png,application/pdf">
+                            </div>
+                            <div class="file-path-wrapper">
+                                <input class="file-path validate" type="text" placeholder="Upload your visa document">
+                            </div>
+                        </div>
+                        <i class="material-icons file-upload-status" id="visa_file_status">check_circle</i>
+                    </div>
+                    <div class="col s12 file-upload-container" id="medical_certificate_upload_group">
+                        <div class="file-field input-field">
+                            <div class="btn file-upload-btn">
+                                <span>Medical Certificate (Optional)</span>
+                                <input type="file" id="medical_certificate_file" accept="image/jpeg,image/jpg,image/png,application/pdf">
+                            </div>
+                            <div class="file-path-wrapper">
+                                <input class="file-path validate" type="text" placeholder="Upload your medical certificate">
+                            </div>
+                        </div>
+                        <i class="material-icons file-upload-status" id="medical_certificate_file_status">check_circle</i>
+                    </div>
+                    <div class="col s12 file-upload-container" id="invitation_letter_upload_group">
+                        <div class="file-field input-field">
+                            <div class="btn file-upload-btn">
+                                <span>Invitation Letter (Optional)</span>
+                                <input type="file" id="invitation_letter_file" accept="image/jpeg,image/jpg,image/png,application/pdf">
+                            </div>
+                            <div class="file-path-wrapper">
+                                <input class="file-path validate" type="text" placeholder="Upload your invitation letter">
+                            </div>
+                        </div>
+                        <i class="material-icons file-upload-status" id="invitation_letter_file_status">check_circle</i>
+                    </div>
+                    <div class="col s12 file-upload-container" id="travel_insurance_upload_group">
+                        <div class="file-field input-field">
+                            <div class="btn file-upload-btn">
+                                <span>Travel Insurance (Optional)</span>
+                                <input type="file" id="travel_insurance_file" accept="image/jpeg,image/jpg,image/png,application/pdf">
+                            </div>
+                            <div class="file-path-wrapper">
+                                <input class="file-path validate" type="text" placeholder="Upload your travel insurance">
+                            </div>
+                        </div>
+                        <i class="material-icons file-upload-status" id="travel_insurance_file_status">check_circle</i>
+                    </div>
+                    <div class="col s12 file-upload-container" id="other_docs_upload_group">
+                        <div class="file-field input-field">
+                            <div class="btn file-upload-btn">
+                                <span>Other Docs (Optional)</span>
+                                <input type="file" id="other_documents_file" accept="image/jpeg,image/jpg,image/png,application/pdf,application/zip">
+                            </div>
+                            <div class="file-path-wrapper">
+                                <input class="file-path validate" type="text" placeholder="Upload other supporting documents (e.g., medical, invitation)">
+                            </div>
+                        </div>
+                        <i class="material-icons file-upload-status" id="other_documents_file_status">check_circle</i>
+                    </div>
+                    <div class="col s12 center-align">
+                        <div class="row upload-buttons-row">
+                            <div class="col s6 center-align">
+                                <button class="btn waves-effect waves-light grey" id="backToBookingBtn">
+                                    Back
+                                    <i class="material-icons left">arrow_back</i>
+                                </button>
+                            </div>
+                            <div class="col s6 center-align">
+                                <button class="btn waves-effect waves-light" type="submit" name="action" id="submitDocumentsBtn">
+                                    Submit Documents
+                                    <i class="material-icons right">send</i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="results-display-section">
+                <div id="loader-container">
+                    <!-- loading container -->
+                    <i class="material-icons" id="loader-icon"></i> <div class="preloader-wrapper big active">
+                        <div class="spinner-layer spinner-blue-only">
+                            <div class="circle-clipper left">
+                                <div class="circle"></div>
+                            </div><div class="gap-patch">
+                                <div class="circle"></div>
+                            </div><div class="circle-clipper right">
+                                <div class="circle"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="loading-message">Checking requirements for your travel...</div>
+                </div>
+
+                <div id="validationResults">
+                    <h5 class="center-align" style="margin-top: 30px;">Validation Checks</h5>
+                    <div class="card-panel grey lighten-4 z-depth-1">
+                        <div class="validation-item" id="passportCheck">
+                            <i class="material-icons">hourglass_empty</i>
+                            <span>Passport Validation Check: <span class="status-text">Pending...</span></span>
+                        </div>
+                        <div class="validation-item" id="passportDataExtractionCheck">
+                            <i class="material-icons">hourglass_empty</i>
+                            <span>Passport Data Extraction: <span class="status-text">Pending...</span></span>
+                        </div>
+                        <div class="validation-item" id="extractedFirstName">
+                            <i class="material-icons">person</i>
+                            <span>First Name: <span class="status-text">N/A</span></span>
+                        </div>
+                        <div class="validation-item" id="extractedLastName">
+                            <i class="material-icons">person_outline</i>
+                            <span>Last Name: <span class="status-text">N/A</span></span>
+                        </div>
+                        <div class="validation-item" id="extractedPassportNumber">
+                            <i class="material-icons">credit_card</i>
+                            <span>Passport Number: <span class="status-text">N/A</span></span>
+                        </div>
+                        <div class="validation-item" id="extractedPassportExpiryDate">
+                            <i class="material-icons">date_range</i>
+                            <span>Passport Expiry Date: <span class="status-text">N/A</span></span>
+                        </div>
+                        <div class="validation-item" id="visaRequirementCheck">
+                            <i class="material-icons">hourglass_empty</i>
+                            <span>Visa Requirement Check: <span class="status-text">Pending...</span></span>
+                        </div>
+                        <div class="validation-item" id="visaDataExtractionCheck">
+                            <i class="material-icons">hourglass_empty</i>
+                            <span>Visa Data Extraction: <span class="status-text">Pending...</span></span>
+                        </div>
+                        <div class="validation-item" id="extractedVisaFirstName">
+                            <i class="material-icons">person</i>
+                            <span>Visa First Name: <span class="status-text">N/A</span></span>
+                        </div>
+                        <div class="validation-item" id="extractedVisaLastName">
+                            <i class="material-icons">person_outline</i>
+                            <span>Visa Last Name: <span class="status-text">N/A</span></span>
+                        </div>
+                        <div class="validation-item" id="extractedVisaNumber">
+                            <i class="material-icons">vpn_key</i>
+                            <span>Visa Number: <span class="status-text">N/A</span></span>
+                        </div>
+                        <div class="validation-item" id="extractedVisaAssociatedPassportNumber">
+                            <i class="material-icons">credit_card</i>
+                            <span>Visa Passport No.: <span class="status-text">N/A</span></span>
+                        </div>
+                        <div class="validation-item" id="extractedVisaIssueDate">
+                            <i class="material-icons">event</i>
+                            <span>Visa Issue Date: <span class="status-text">N/A</span></span>
+                        </div>
+                        <div class="validation-item" id="extractedVisaExpiryDate">
+                            <i class="material-icons">date_range</i>
+                            <span>Visa Expiry Date: <span class="status-text">N/A</span></span>
+                        </div>
+                        <div class="validation-item" id="extractedVisaNationality">
+                            <i class="material-icons">flag</i>
+                            <span>Visa Nationality: <span class="status-text">N/A</span></span>
+                        </div>
+                        <div class="validation-item" id="healthRequirementCheck">
+                            <i class="material-icons">hourglass_empty</i>
+                            <span>Health Requirement Check: <span class="status-text">Pending...</span></span>
+                        </div>
+                        <div class="validation-item" id="transitRequirementCheck">
+                            <i class="material-icons">hourglass_empty</i>
+                            <span>Transit Requirement Check: <span class="status-text">Pending...</span></span>
+                        </div>
+                        <div class="validation-item" id="travelHistoryCheck">
+                            <i class="material-icons">hourglass_empty</i>
+                            <span>Travel History Check: <span class="status-text">Pending...</span></span>
+                        </div>
+                        <div class="validation-item" id="medicalCertificateCheck">
+                            <i class="material-icons">hourglass_empty</i>
+                            <span>Medical Certificate Check: <span class="status-text">Pending...</span></span>
+                        </div>
+                        <div class="validation-item" id="invitationLetterCheck">
+                            <i class="material-icons">hourglass_empty</i>
+                            <span>Invitation Letter Check: <span class="status-text">Pending...</span></span>
+                        </div>
+                        <div class="validation-item" id="travelInsuranceCheck">
+                            <i class="material-icons">hourglass_empty</i>
+                            <span>Travel Insurance Check: <span class="status-text">Pending...</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+<!-- success holder - harry -->
+
+            <div id="final-results-section">
+                <div id="overallStatus" class="center-align success-text" style="margin-top: 20px;">
+                    <i class="material-icons">check_circle</i>
+                    All Checks Completed Successfully!
+                </div>
+
+                <div id="emailConfirmationMessage" class="center-align success-text" style="margin-top: 10px; font-size: 1.1rem; display: none;">
+                    A summary of your validation results has been sent to your registered email address.
+                </div>
+<!-- letys see whether this works for diff qr temp holder - harry -->
+                <div id="qrcode-container">
+                    <div id="qrcode"></div>
+                    <div class="ok-to-board-message">
+                        <i class="material-icons">check_circle</i>
+                        OK TO BOARD
+                    </div>
+                </div>
+
+                <div class="col s12 center-align final-buttons-container">
+                    <button class="btn waves-effect waves-light" id="samsung-wallet-btn">
+                        Add to Samsung Wallet
+                        <i class="material-icons right">wallet</i>
+                    </button>
+                    <button class="btn waves-effect waves-light" id="newValidationBtn">
+                        New Validation
+                        <i class="material-icons right">refresh</i>
+                    </button>
+                </div>
+            </div>
+<!-- failure golder - harry -->
+
+            <div id="manual-verification-section">
+                <div class="center-align failure-text" style="margin-top: 20px; font-size: 1.5rem;">
+                    <i class="material-icons" style="font-size: 2.5rem;">error_outline</i>
+                    <p class="failure-text">Online document validation was unsuccessful.</p>
+                    <p>Don't worry, you're not left behind!</p>
+                    <p>We found issues with the following:</p>
+                    <div id="failed-checks-list" style="text-align: left; margin: 10px auto; max-width: 80%;">
+                        </div>
+                    <p>Please correct these details if possible or proceed to the airport for manual verification.</p>
+                    <p>Our staff will be happy to assist you.</p>
+                </div>
+                <div class="col s12 center-align" style="margin-top: 30px;">
+                    <button class="btn waves-effect waves-light" id="newValidationBtnFailure">
+                        New Validation
+                        <i class="material-icons right">refresh</i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="page-footer">
+        <div class="footer-copyright">
+            <div class="container">
+            © 2025 Jahis Pass - Boarding experience redefined - powered by Emirates
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const proceedToUploadBtn = document.getElementById('proceedToUploadBtn');
+            const sendOtpBtn = document.getElementById('sendOtpBtn');
+            const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+            const backToBookingFromOtpBtn = document.getElementById('backToBookingFromOtpBtn');
+            const submitDocumentsBtn = document.getElementById('submitDocumentsBtn');
+            const backToBookingBtn = document.getElementById('backToBookingBtn');
+            const newValidationBtn = document.getElementById('newValidationBtn');
+            const newValidationBtnFailure = document.getElementById('newValidationBtnFailure');
+
+            const bookingSection = document.getElementById('booking-section');
+            const otpSection = document.getElementById('otp-section');
+            const uploadSection = document.getElementById('upload-section');
+            const resultsDisplaySection = document.getElementById('results-display-section');
+            const finalResultsSection = document.getElementById('final-results-section');
+            const manualVerificationSection = document.getElementById('manual-verification-section');
+            
+            const bookingReferenceInput = document.getElementById('booking_reference');
+            const registeredEmailInput = document.getElementById('registered_email');
+            const otpInput = document.getElementById('otp_input');
+            const uploadSectionHeading = document.getElementById('upload-section-heading');
+
+
+            const overallStatusDiv = document.getElementById('overallStatus');
+            const emailConfirmationMessage = document.getElementById('emailConfirmationMessage');
+            const qrcodeContainer = document.getElementById('qrcode-container');
+            const qrcodeDiv = document.getElementById('qrcode');
+            const loaderContainer = document.getElementById('loader-container');
+            const loadingMessage = document.getElementById('loading-message');
+            const loaderIcon = document.getElementById('loader-icon');
+            const samsungWalletBtn = document.getElementById('samsung-wallet-btn');
+
+            const passportFileInput = document.getElementById('passport_file');
+            const passportFilePathInput = passportFileInput.closest('.file-field').querySelector('.file-path');
+            const passportFileStatus = document.getElementById('passport_file_status');
+            const passportUploadGroup = document.getElementById('passport_upload_group');
+
+            const visaFileInput = document.getElementById('visa_file');
+            const visaFilePathInput = visaFileInput.closest('.file-field').querySelector('.file-path');
+            const visaFileStatus = document.getElementById('visa_file_status');
+            const visaUploadGroup = document.getElementById('visa_upload_group');
+
+            const medicalCertificateFileInput = document.getElementById('medical_certificate_file');
+            const medicalCertificateFilePathInput = medicalCertificateFileInput.closest('.file-field').querySelector('.file-path');
+            const medicalCertificateFileStatus = document.getElementById('medical_certificate_file_status');
+            const medicalCertificateUploadGroup = document.getElementById('medical_certificate_upload_group');
+
+            const invitationLetterFileInput = document.getElementById('invitation_letter_file');
+            const invitationLetterFilePathInput = invitationLetterFileInput.closest('.file-field').querySelector('.file-path');
+            const invitationLetterFileStatus = document.getElementById('invitation_letter_file_status');
+            const invitationLetterUploadGroup = document.getElementById('invitation_letter_upload_group');
+
+            const travelInsuranceFileInput = document.getElementById('travel_insurance_file');
+            const travelInsuranceFilePathInput = travelInsuranceFileInput.closest('.file-field').querySelector('.file-path');
+            const travelInsuranceFileStatus = document.getElementById('travel_insurance_file_status');
+            const travelInsuranceUploadGroup = document.getElementById('travel_insurance_upload_group');
+
+            const otherDocumentsFileInput = document.getElementById('other_documents_file');
+            const otherDocumentsFilePathInput = otherDocumentsFileInput.closest('.file-field').querySelector('.file-path');
+            const otherDocumentsFileStatus = document.getElementById('other_documents_file_status');
+            const otherDocsUploadGroup = document.getElementById('other_docs_upload_group');
+
+            const passportDataExtractionCheck = document.getElementById('passportDataExtractionCheck');
+            const extractedFirstName = document.getElementById('extractedFirstName');
+            const extractedLastName = document.getElementById('extractedLastName');
+            const extractedPassportNumber = document.getElementById('extractedPassportNumber');
+            const extractedPassportExpiryDate = document.getElementById('extractedPassportExpiryDate');
+
+            const visaDataExtractionCheck = document.getElementById('visaDataExtractionCheck');
+            const extractedVisaFirstName = document.getElementById('extractedVisaFirstName');
+            const extractedVisaLastName = document.getElementById('extractedVisaLastName');
+            const extractedVisaNumber = document.getElementById('extractedVisaNumber');
+            const extractedVisaAssociatedPassportNumber = document.getElementById('extractedVisaAssociatedPassportNumber');
+            const extractedVisaIssueDate = document.getElementById('extractedVisaIssueDate');
+            const extractedVisaExpiryDate = document.getElementById('extractedVisaExpiryDate');
+            const extractedVisaNationality = document.getElementById('extractedVisaNationality');
+
+            // highlevel drill down
+            const checks = [
+                { id: 'passportCheck', name: 'Passport Validation Check' },
+                { id: 'passportDataExtractionCheck', name: 'Passport Data Extraction' },
+                { id: 'visaRequirementCheck', name: 'Visa Requirement Check' },
+                { id: 'visaDataExtractionCheck', name: 'Visa Data Extraction' },
+                { id: 'healthRequirementCheck', name: 'Health Requirement Check' },
+                { id: 'transitRequirementCheck', name: 'Transit Requirement Check' },
+                { id: 'travelHistoryCheck', name: 'Travel History Check' },
+                { id: 'medicalCertificateCheck', name: 'Medical Certificate Check' },
+                { id: 'invitationLetterCheck', name: 'Invitation Letter Check' },
+                { id: 'travelInsuranceCheck', name: 'Travel Insurance Check' }
+            ];
+
+            // only for initial mock up - harry
+            const mockDestinations = [
+                "Dubai, UAE",
+                "London, UK",
+                "New York, USA",
+                "Sydney, Australia",
+                "Tokyo, Japan",
+                "Singapore",
+                "Germany",
+                "Brazil"
+            ];
+
+            const mandatoryDocumentRules = {
+                'DXB': ['passport_file', 'visa_file'],
+                'LHR': ['passport_file', 'medical_certificate_file'],
+                'SIN': ['passport_file', 'travel_insurance_file'],
+                'BER': ['passport_file', 'invitation_letter_file'],
+                'RIO': ['passport_file', 'visa_file', 'medical_certificate_file'],
+                'DEFAULT': ['passport_file']
+            };
+
+            let currentDestinationCode = 'DEFAULT';
+
+            function updateMandatoryFields(destinationCode) {
+                const currentMandatory = mandatoryDocumentRules[destinationCode] || mandatoryDocumentRules['DEFAULT'];
+
+                const allFileInputs = [
+                    { id: 'passport_file', input: passportFileInput, status: passportFileStatus, group: passportUploadGroup, label: 'Passport File' },
+                    { id: 'visa_file', input: visaFileInput, status: visaFileStatus, group: visaUploadGroup, label: 'Visa File' },
+                    { id: 'medical_certificate_file', input: medicalCertificateFileInput, status: medicalCertificateFileStatus, group: medicalCertificateUploadGroup, label: 'Medical Certificate' },
+                    { id: 'invitation_letter_file', input: invitationLetterFileInput, status: invitationLetterFileStatus, group: invitationLetterUploadGroup, label: 'Invitation Letter' },
+                    { id: 'travel_insurance_file', input: travelInsuranceFileInput, status: travelInsuranceFileStatus, group: travelInsuranceUploadGroup, label: 'Travel Insurance' },
+                    { id: 'other_documents_file', input: otherDocumentsFileInput, status: otherDocumentsFileStatus, group: otherDocsUploadGroup, label: 'Other Docs' }
+                ];
+
+                allFileInputs.forEach(item => {
+                    const isMandatory = currentMandatory.includes(item.id);
+                    item.input.required = isMandatory;
+
+                    const buttonSpan = item.group.querySelector('.file-field .btn span');
+                    if (buttonSpan) {
+                        buttonSpan.textContent = `${item.label} (${isMandatory ? 'Mandatory' : 'Optional'})`;
+                    }
+
+                    if (isMandatory) {
+                        item.group.classList.add('mandatory');
+                        item.group.classList.remove('optional');
+                    } else {
+                        item.group.classList.remove('mandatory');
+                        item.group.classList.add('optional');
+                    }
+                });
+            }
+
+
+            function resetValidationStatus() {
+                bookingReferenceInput.value = '';
+                registeredEmailInput.value = 'test@example.com';
+                otpInput.value = '';
+
+                const fileInputs = [
+                    { input: passportFileInput, filePath: passportFilePathInput, status: passportFileStatus },
+                    { input: visaFileInput, filePath: visaFilePathInput, status: visaFileStatus },
+                    { input: medicalCertificateFileInput, filePath: medicalCertificateFilePathInput, status: medicalCertificateFileStatus },
+                    { input: invitationLetterFileInput, filePath: invitationLetterFilePathInput, status: invitationLetterFileStatus },
+                    { input: travelInsuranceFileInput, filePath: travelInsuranceFilePathInput, status: travelInsuranceFileStatus },
+                    { input: otherDocumentsFileInput, filePath: otherDocumentsFilePathInput, status: otherDocumentsFileStatus }
+                ];
+
+                fileInputs.forEach(item => {
+                    if (item.input) {
+                        item.input.value = '';
+                    }
+                    if (item.filePath) {
+                        item.filePath.value = '';
+                    }
+                    if (item.status) {
+                        item.status.style.display = 'none';
+                    }
+                });
+
+                extractedFirstName.querySelector('.status-text').textContent = 'N/A';
+                extractedLastName.querySelector('.status-text').textContent = 'N/A';
+                extractedPassportNumber.querySelector('.status-text').textContent = 'N/A';
+                extractedPassportExpiryDate.querySelector('.status-text').textContent = 'N/A';
+                passportDataExtractionCheck.classList.remove('completed', 'failed');
+                passportDataExtractionCheck.querySelector('i').textContent = 'hourglass_empty';
+                passportDataExtractionCheck.querySelector('span.status-text').textContent = 'Pending...';
+                passportDataExtractionCheck.querySelector('i').style.color = '#757575';
+
+                extractedVisaFirstName.querySelector('.status-text').textContent = 'N/A';
+                extractedVisaLastName.querySelector('.status-text').textContent = 'N/A';
+                extractedVisaNumber.querySelector('.status-text').textContent = 'N/A';
+                extractedVisaAssociatedPassportNumber.querySelector('.status-text').textContent = 'N/A';
+                extractedVisaIssueDate.querySelector('.status-text').textContent = 'N/A';
+                extractedVisaExpiryDate.querySelector('.status-text').textContent = 'N/A';
+                extractedVisaNationality.querySelector('.status-text').textContent = 'N/A';
+                visaDataExtractionCheck.classList.remove('completed', 'failed');
+                visaDataExtractionCheck.querySelector('i').textContent = 'hourglass_empty';
+                visaDataExtractionCheck.querySelector('span.status-text').textContent = 'Pending...';
+                visaDataExtractionCheck.querySelector('i').style.color = '#757575';
+
+
+                bookingSection.style.display = 'block';
+                otpSection.style.display = 'none';
+                uploadSection.style.display = 'none';
+                resultsDisplaySection.style.display = 'none';
+                finalResultsSection.style.display = 'none';
+                manualVerificationSection.style.display = 'none';
+                
+                overallStatusDiv.classList.add('success-text');
+                overallStatusDiv.style.color = '';
+                emailConfirmationMessage.style.display = 'none';
+                qrcodeContainer.style.display = 'none';
+                samsungWalletBtn.style.display = 'none';
+                newValidationBtn.style.display = 'none';
+                newValidationBtnFailure.style.display = 'none';
+                loaderContainer.style.display = 'none';
+                loaderIcon.style.display = 'none';
+                loadingMessage.textContent = '';
+
+                checks.forEach(check => {
+                    const el = document.getElementById(check.id);
+                    el.classList.remove('completed', 'failed');
+                    el.querySelector('i').textContent = 'hourglass_empty';
+                    el.querySelector('span.status-text').textContent = 'Pending...';
+                    el.querySelector('i').style.color = '#757575';
+                });
+
+                const failedChecksList = document.getElementById('failed-checks-list');
+                if (failedChecksList) {
+                    failedChecksList.innerHTML = '';
+                }
+
+                updateMandatoryFields('DEFAULT');
+            }
+
+            // mock call - harry
+            async function mockApiCall(checkName, success = true, delay = 1000, data = {}) {
+                return new Promise(async (resolve) => {
+                    setTimeout(async () => {
+                        if (checkName === 'Passport Data Extraction') {
+                            const mockAIResponse = {
+                                firstName: "JOHN",
+                                lastName: "DOE",
+                                passportNumber: "P1234567",
+                                expiryDate: "2030-12-31"
+                            };
+                            resolve({ success: true, data: mockAIResponse });
+
+                        } else if (checkName === 'Visa Data Extraction') {
+                            const mockAIResponse = {
+                                visaFirstName: "JANE",
+                                visaLastName: "SMITH",
+                                visaNumber: "V987654321",
+                                associatedPassportNumber: "P1234567",
+                                issueDate: "2023-01-01",
+                                expiryDate: "2028-06-15",
+                                nationality: "US"
+                            };
+                            resolve({ success: true, data: mockAIResponse });
+                        } else if (checkName === 'Fetch Booking Details') {
+                            const bookingRef = data.bookingReference;
+                            let destinationCode = 'DEFAULT';
+                            let destinationName = 'Unknown Destination';
+
+                            if (bookingRef.startsWith('DXB')) {
+                                destinationCode = 'DXB';
+                                destinationName = 'Dubai, UAE';
+                            } else if (bookingRef.startsWith('LHR')) {
+                                destinationCode = 'LHR';
+                                destinationName = 'London, UK';
+                            } else if (bookingRef.startsWith('SIN')) {
+                                destinationCode = 'SIN';
+                                destinationName = 'Singapore';
+                            } else if (bookingRef.startsWith('BER')) {
+                                destinationCode = 'BER';
+                                destinationName = 'Germany';
+                            } else if (bookingRef.startsWith('RIO')) {
+                                destinationCode = 'RIO';
+                                destinationName = 'Brazil';
+                            }
+                            else {
+                                const randomDestIndex = Math.floor(Math.random() * mockDestinations.length);
+                                destinationName = mockDestinations[randomDestIndex];
+                                destinationCode = 'DEFAULT';
+                            }
+                            resolve({ success: true, data: { destinationCode, destinationName } });
+                        } else if (checkName === 'Send OTP') {
+                            console.log(`Mock OTP sent to ${data.email}: 123456`);
+                            resolve({ success: true, otp: '123456' });
+                        } else if (checkName === 'Verify OTP') {
+                            const expectedOtp = '123456';
+                            if (data.otp === expectedOtp) {
+                                resolve({ success: true });
+                            } else {
+                                resolve({ success: false, message: 'Invalid OTP' });
+                            }
+                        }
+                        else {
+                            let failureReason = '';
+                            if (!success) {
+                                switch (checkName) {
+                                    case 'Passport Validation Check':
+                                        failureReason = 'Passport expired or invalid.';
+                                        break;
+                                    case 'Passport Data Extraction':
+                                        failureReason = 'Could not extract data from passport. File might be corrupt or unreadable.';
+                                        break;
+                                    case 'Visa Requirement Check':
+                                        failureReason = 'Visa required for destination, but not provided or recognized.';
+                                        break;
+                                    case 'Visa Data Extraction':
+                                        failureReason = 'Could not extract data from visa. File might be corrupt or unreadable.';
+                                        break;
+                                    case 'Health Requirement Check':
+                                        failureReason = 'Health declaration or vaccination proof missing/invalid.';
+                                        break;
+                                    case 'Transit Requirement Check':
+                                        failureReason = 'Transit visa or specific transit requirements not met.';
+                                        break;
+                                    case 'Travel History Check':
+                                        failureReason = 'Travel history flags potential entry issues.';
+                                        break;
+                                    case 'Medical Certificate Check':
+                                        failureReason = 'Medical certificate is missing or does not meet requirements.';
+                                        break;
+                                    case 'Invitation Letter Check':
+                                        failureReason = 'Invitation letter is missing or invalid.';
+                                        break;
+                                    case 'Travel Insurance Check':
+                                        failureReason = 'Travel insurance is missing or does not cover required duration/conditions.';
+                                        break;
+                                    default:
+                                        failureReason = 'Reason unknown. Please check your documents.';
+                                }
+                            }
+                            resolve({ success: success, reason: failureReason });
+                        }
+                    }, delay);
+                });
+            }
+
+            samsungWalletBtn.addEventListener('click', function() {
+                M.toast({html: 'Simulating "Add to Samsung Wallet" action...', classes: 'blue'});
+                console.log("Attempting to add 'OK TO BOARD' to Samsung Wallet (mock action).");
+            });
+
+            passportFileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    passportFileStatus.style.display = 'block';
+                    passportFilePathInput.value = this.files[0].name;
+                } else {
+                    passportFileStatus.style.display = 'none';
+                    passportFilePathInput.value = '';
+                }
+            });
+
+            visaFileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    visaFileStatus.style.display = 'block';
+                    visaFilePathInput.value = this.files[0].name;
+                } else {
+                    visaFileStatus.style.display = 'none';
+                    visaFilePathInput.value = '';
+                }
+            });
+
+            medicalCertificateFileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    medicalCertificateFileStatus.style.display = 'block';
+                    medicalCertificateFilePathInput.value = this.files[0].name;
+                } else {
+                    medicalCertificateFileStatus.style.display = 'none';
+                    medicalCertificateFilePathInput.value = '';
+                }
+            });
+
+            invitationLetterFileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    invitationLetterFileStatus.style.display = 'block';
+                    invitationLetterFilePathInput.value = this.files[0].name;
+                } else {
+                    invitationLetterFileStatus.style.display = 'none';
+                    invitationLetterFilePathInput.value = '';
+                }
+            });
+
+            travelInsuranceFileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    travelInsuranceFileStatus.style.display = 'block';
+                    travelInsuranceFilePathInput.value = this.files[0].name;
+                } else {
+                    travelInsuranceFileStatus.style.display = 'none';
+                    travelInsuranceFilePathInput.value = '';
+                }
+            });
+
+            otherDocumentsFileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    otherDocumentsFileStatus.style.display = 'block';
+                    otherDocumentsFilePathInput.value = this.files[0].name;
+                } else {
+                    otherDocumentsFileStatus.style.display = 'none';
+                    otherDocumentsFilePathInput.value = '';
+                }
+            });
+
+            proceedToUploadBtn.addEventListener('click', async function() {
+                const bookingReference = bookingReferenceInput.value.trim();
+
+                if (!bookingReference) {
+                    M.toast({html: 'Please enter Booking Reference.', classes: 'red darken-2'});
+                    return;
+                }
+
+                bookingSection.style.display = 'none';
+                resultsDisplaySection.style.display = 'block';
+                loaderContainer.style.display = 'flex';
+                loaderIcon.style.display = 'block';
+                loaderIcon.textContent = 'flight_land';
+                loadingMessage.textContent = `Fetching booking details for ${bookingReference}...`;
+
+                const bookingDetailsResult = await mockApiCall('Fetch Booking Details', true, 2000, { bookingReference });
+                loaderContainer.style.display = 'none';
+                loaderIcon.style.display = 'none';
+                loadingMessage.textContent = '';
+                resultsDisplaySection.style.display = 'none';
+
+                if (bookingDetailsResult.success) {
+                    currentDestinationCode = bookingDetailsResult.data.destinationCode;
+                    const destinationName = bookingDetailsResult.data.destinationName;
+                    M.toast({html: `Booking details fetched for ${destinationName}.`, classes: 'green darken-2'});
+                    
+                    uploadSectionHeading.textContent = `Upload Your Documents for Travel from DXB to ${destinationName}`;
+
+                    bookingSection.style.display = 'none';
+                    otpSection.style.display = 'block';
+                } else {
+                    M.toast({html: 'Failed to fetch booking details. Please try again.', classes: 'red darken-2'});
+                    bookingSection.style.display = 'block';
+                }
+            });
+
+            sendOtpBtn.addEventListener('click', async function() {
+                const email = registeredEmailInput.value.trim();
+                if (!email) {
+                    M.toast({html: 'Please enter your registered email address.', classes: 'red darken-2'});
+                    return;
+                }
+                
+                M.toast({html: `Sending OTP to ${email}...`, classes: 'blue darken-2'});
+                const otpResult = await mockApiCall('Send OTP', true, 1500, { email: email });
+                if (otpResult.success) {
+                    M.toast({html: 'OTP sent successfully! (Mock OTP: 123456)', classes: 'green darken-2'});
+                } else {
+                    M.toast({html: 'Failed to send OTP. Please try again.', classes: 'red darken-2'});
+                }
+            });
+
+            verifyOtpBtn.addEventListener('click', async function() {
+                const otp = otpInput.value.trim();
+                if (!otp) {
+                    M.toast({html: 'Please enter the OTP.', classes: 'red darken-2'});
+                    return;
+                }
+
+                M.toast({html: 'Verifying OTP...', classes: 'blue darken-2'});
+                const verifyResult = await mockApiCall('Verify OTP', true, 1000, { otp: otp });
+                if (verifyResult.success) {
+                    M.toast({html: 'OTP verified successfully!', classes: 'green darken-2'});
+                    otpSection.style.display = 'none';
+                    updateMandatoryFields(currentDestinationCode);
+                    uploadSection.style.display = 'block';
+                } else {
+                    M.toast({html: 'Invalid OTP. Please try again.', classes: 'red darken-2'});
+                }
+            });
+
+            backToBookingFromOtpBtn.addEventListener('click', function() {
+                otpSection.style.display = 'none';
+                bookingSection.style.display = 'block';
+                registeredEmailInput.value = 'test@example.com';
+                otpInput.value = '';
+            });
+
+            // improtant
+            submitDocumentsBtn.addEventListener('click', async function() {
+                let allRequiredFilesUploaded = true;
+                const fileInputsToCheck = [
+                    { input: passportFileInput, label: 'Passport File' },
+                    { input: visaFileInput, label: 'Visa File' },
+                    { input: medicalCertificateFileInput, label: 'Medical Certificate File' },
+                    { input: invitationLetterFileInput, label: 'Invitation Letter File' },
+                    { input: travelInsuranceFileInput, label: 'Travel Insurance File' },
+                    { input: otherDocumentsFileInput, label: 'Other Docs' }
+                ];
+
+                fileInputsToCheck.forEach(item => {
+                    if (item.input.required && !item.input.files[0]) {
+                        M.toast({html: `Please upload your ${item.label}.`, classes: 'red darken-2'});
+                        allRequiredFilesUploaded = false;
+                    }
+                });
+
+                if (!allRequiredFilesUploaded) {
+                    return;
+                }
+
+                uploadSection.style.display = 'none';
+                resultsDisplaySection.style.display = 'block';
+                loaderContainer.style.display = 'flex';
+                loaderIcon.style.display = 'none';
+                
+                const currentDestinationForValidation = uploadSectionHeading.textContent.replace('Upload Your Documents for Travel from DXB to ', '');
+                loadingMessage.textContent = `Checking requirements for your travel to ${currentDestinationForValidation}...`;
+
+
+                M.toast({html: 'Initiating validation checks...', classes: 'blue darken-2'});
+
+                let allChecksSuccessful = true;
+                let failedChecksDetails = [];
+
+                // dummty
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+
+
+
+
+                for (const check of checks) {
+                    const el = document.getElementById(check.id);
+                    const statusTextSpan = el.querySelector('span.status-text');
+                    const icon = el.querySelector('i');
+
+                    const checkSuccess = Math.random() < 0.8;
+
+                    let currentCheckFailed = false;
+                    let result;
+
+                    if (check.id === 'passportDataExtractionCheck') {
+                        if (passportFileInput.files[0]) {
+                            result = await mockApiCall(check.name, checkSuccess);
+                            if (result.success && result.data) {
+                                statusTextSpan.textContent = 'Extracted Successfully';
+                                el.classList.add('completed');
+                                icon.textContent = 'check_circle';
+                                icon.style.color = '#4CAF50';
+                                extractedFirstName.querySelector('.status-text').textContent = result.data.firstName;
+                                extractedLastName.querySelector('.status-text').textContent = result.data.lastName;
+                                extractedPassportNumber.querySelector('.status-text').textContent = result.data.passportNumber;
+                                extractedPassportExpiryDate.querySelector('.status-text').textContent = result.data.expiryDate;
+                            } else {
+                                statusTextSpan.textContent = 'Extraction Failed';
+                                el.classList.add('failed');
+                                icon.textContent = 'cancel';
+                                icon.style.color = '#f44336';
+                                allChecksSuccessful = false;
+                                currentCheckFailed = true;
+                            }
+                        } else {
+                            statusTextSpan.textContent = 'N/A (Passport not uploaded)';
+                            el.querySelector('i').textContent = 'info';
+                            el.querySelector('i').style.color = '#757575';
+                        }
+                    } else if (check.id === 'visaDataExtractionCheck') {
+                        if (visaFileInput.files[0]) {
+                            result = await mockApiCall(check.name, checkSuccess);
+                            if (result.success && result.data) {
+                                statusTextSpan.textContent = 'Extracted Successfully';
+                                el.classList.add('completed');
+                                icon.textContent = 'check_circle';
+                                icon.style.color = '#4CAF50';
+                                extractedVisaFirstName.querySelector('.status-text').textContent = result.data.visaFirstName;
+                                extractedVisaLastName.querySelector('.status-text').textContent = result.data.visaLastName;
+                                extractedVisaNumber.querySelector('.status-text').textContent = result.data.visaNumber;
+                                extractedVisaAssociatedPassportNumber.querySelector('.status-text').textContent = result.data.associatedPassportNumber;
+                                extractedVisaIssueDate.querySelector('.status-text').textContent = result.data.issueDate;
+                                extractedVisaExpiryDate.querySelector('.status-text').textContent = result.data.expiryDate;
+                                extractedVisaNationality.querySelector('.status-text').textContent = result.data.nationality;
+                            } else {
+                                statusTextSpan.textContent = 'Extraction Failed';
+                                el.classList.add('failed');
+                                icon.textContent = 'cancel';
+                                icon.style.color = '#f44336';
+                                allChecksSuccessful = false;
+                                currentCheckFailed = true;
+                            }
+                        } else {
+                            statusTextSpan.textContent = 'N/A (Visa not uploaded)';
+                            el.querySelector('i').textContent = 'info';
+                            el.querySelector('i').style.color = '#757575';
+                        }
+                    } else if (check.id === 'medicalCertificateCheck') {
+                        if (medicalCertificateFileInput.files[0]) {
+                            result = await mockApiCall(check.name, checkSuccess);
+                            if (result.success) {
+                                statusTextSpan.textContent = 'Checked Successfully';
+                                el.classList.add('completed');
+                                icon.textContent = 'check_circle';
+                                icon.style.color = '#4CAF50';
+                            } else {
+                                statusTextSpan.textContent = 'Check Failed';
+                                el.classList.add('failed');
+                                icon.textContent = 'cancel';
+                                icon.style.color = '#f44336';
+                                allChecksSuccessful = false;
+                                currentCheckFailed = true;
+                            }
+                        } else {
+                            statusTextSpan.textContent = 'N/A (Not uploaded)';
+                            el.querySelector('i').textContent = 'info';
+                            el.querySelector('i').style.color = '#757575';
+                        }
+                    } else if (check.id === 'invitationLetterCheck') {
+                        if (invitationLetterFileInput.files[0]) {
+                            result = await mockApiCall(check.name, checkSuccess);
+                            if (result.success) {
+                                statusTextSpan.textContent = 'Checked Successfully';
+                                el.classList.add('completed');
+                                icon.textContent = 'check_circle';
+                                icon.style.color = '#4CAF50';
+                            } else {
+                                statusTextSpan.textContent = 'Check Failed';
+                                el.classList.add('failed');
+                                icon.textContent = 'cancel';
+                                icon.style.color = '#f44336';
+                                allChecksSuccessful = false;
+                                currentCheckFailed = true;
+                            }
+                        } else {
+                            statusTextSpan.textContent = 'N/A (Not uploaded)';
+                            el.querySelector('i').textContent = 'info';
+                            el.querySelector('i').style.color = '#757575';
+                        }
+                    } else if (check.id === 'travelInsuranceCheck') {
+                        if (travelInsuranceFileInput.files[0]) {
+                            result = await mockApiCall(check.name, checkSuccess);
+                            if (result.success) {
+                                statusTextSpan.textContent = 'Checked Successfully';
+                                el.classList.add('completed');
+                                icon.textContent = 'check_circle';
+                                icon.style.color = '#4CAF50';
+                            } else {
+                                statusTextSpan.textContent = 'Check Failed';
+                                el.classList.add('failed');
+                                icon.textContent = 'cancel';
+                                icon.style.color = '#f44336';
+                                allChecksSuccessful = false;
+                                currentCheckFailed = true;
+                            }
+                        } else {
+                            statusTextSpan.textContent = 'N/A (Not uploaded)';
+                            el.querySelector('i').textContent = 'info';
+                            el.querySelector('i').style.color = '#757575';
+                        }
+                    }
+                    else {
+                        result = await mockApiCall(check.name, checkSuccess);
+                        if (result.success) {
+                            statusTextSpan.textContent = 'Completed Successfully';
+                            el.classList.add('completed');
+                            icon.textContent = 'check_circle';
+                            icon.style.color = '#4CAF50';
+                        } else {
+                            statusTextSpan.textContent = 'Failed';
+                            el.classList.add('failed');
+                            icon.textContent = 'cancel';
+                            icon.style.color = '#f44336';
+                            allChecksSuccessful = false;
+                            currentCheckFailed = true;
+                        }
+                    }
+                    if (currentCheckFailed) {
+                        failedChecksDetails.push({ name: check.name, id: check.id, reason: result.reason });
+                    }
+                }
+
+                loaderContainer.style.display = 'none';
+                loaderIcon.style.display = 'none';
+                loadingMessage.textContent = '';
+
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                resultsDisplaySection.style.display = 'none';
+
+
+
+
+
+
+
+                if (allChecksSuccessful) {
+                    finalResultsSection.style.display = 'block';
+                    overallStatusDiv.textContent = 'All Checks Completed Successfully!';
+                    overallStatusDiv.classList.add('success-text');
+                    overallStatusDiv.style.color = '';
+                    emailConfirmationMessage.style.display = 'block';
+
+                    qrcodeContainer.style.display = 'flex';
+                    samsungWalletBtn.style.display = 'flex';
+                    newValidationBtn.style.display = 'flex';
+                    M.toast({html: 'All validations passed!', classes: 'green darken-2'});
+
+                    qrcodeDiv.innerHTML = '';
+                    new QRCode(qrcodeDiv, {
+                        text: "OK TO BOARD",
+                        width: 160,
+                        height: 160,
+                        colorDark : "#000000",
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.H
+                    });
+
+
+
+
+                } else {
+
+
+
+
+
+
+
+
+
+                    manualVerificationSection.style.display = 'block';
+                    M.toast({html: 'Some validations failed. Manual verification required.', classes: 'red darken-2'});
+                    newValidationBtnFailure.style.display = 'block';
+
+                    const failedChecksList = document.getElementById('failed-checks-list');
+                    failedChecksList.innerHTML = '';
+                    if (failedChecksDetails.length > 0) {
+                        failedChecksDetails.forEach(failedCheck => {
+                            const listItem = document.createElement('div');
+                            listItem.classList.add('validation-item');
+                            listItem.innerHTML = `<i class="material-icons" style="color: var(--emirates-red);">warning</i> <span>${failedCheck.name}</span>` +
+                                                 (failedCheck.reason ? `<span class="reason-text">(${failedCheck.reason})</span>` : '');
+                            failedChecksList.appendChild(listItem);
+                        });
+                    } else {
+                        failedChecksList.innerHTML = `<div class="validation-item"><i class="material-icons" style="color: var(--emirates-red);">warning</i> <span>Unknown document issue.</span></div>`;
+                    }
+                }
+            });
+
+
+            backToBookingBtn.addEventListener('click', function() {
+                uploadSection.style.display = 'none';
+                otpSection.style.display = 'block';
+            });
+
+            newValidationBtn.addEventListener('click', resetValidationStatus);
+
+            newValidationBtnFailure.addEventListener('click', resetValidationStatus);
+
+            resetValidationStatus();
+        });
+    </script>
+</body>
+</html>
